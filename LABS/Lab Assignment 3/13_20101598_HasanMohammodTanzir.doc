@@ -1,0 +1,68 @@
+
+
+import random as rnd
+import math as mt
+
+MAX, MIN = 1000, -1000
+array = []
+bracuID = input()
+minRange = int(bracuID[4])
+winningPoint = int(bracuID[-1:-3:-1])
+maxRange = mt.ceil(int(bracuID[-1:-3:-1]) * 1.5)
+shufflecount = 8
+for i in range(0, 8):
+    temp = rnd.randint(minRange,maxRange)
+    array.append(temp)
+
+def findTheWinner(depth, node, boolean, values, alpha, beta):
+    if depth == 3:
+        return values[node]
+
+    if boolean:
+        best = MIN
+        for i in range(0, 2):
+            val = findTheWinner(depth + 1, node * 2 + i, False, values, alpha, beta)
+            best = max(best, val)
+            alpha = max(alpha, best)
+            if beta <= alpha:
+                break
+        return best
+
+    else:
+        best = MAX
+        for i in range(0, 2):
+            val = findTheWinner(depth + 1, node * 2 + i, True, values, alpha, beta)
+            best = min(best, val)
+            beta = min(beta, best)
+            if beta <= alpha:
+                break
+        return best
+
+def shuffletrouble(depth, node, boolean, arr, alpha, beta):
+    optimal_list = []
+    for i in range(shufflecount):
+        rnd.shuffle(arr)
+        depth, node, boolean, array, alpha, beta = 0, 0, True, arr, MIN, MAX
+        optimal = findTheWinner(depth, node, boolean, array, alpha, beta)
+        optimal_list.append(optimal)
+    return optimal_list
+
+
+print('Generated 8 random points between the minimum and maximum point limits:', array)
+print('Total points to win:', winningPoint)
+optimal_value = findTheWinner(0, 0, True, array, MIN, MAX)
+print('Achieved point by applying alpha-beta pruning =', optimal_value)
+if optimal_value > winningPoint:
+    print('The winner is Optimus Prime')
+else:
+    print('The winner is Megatron')
+print()
+print('After the shuffle:')
+optimal_list = shuffletrouble(0, 0, True, array, MIN, MAX)
+print('List of all points values from each shuffles:', optimal_list)
+print('The maximum value of all shuffles:', max(optimal_list))
+count = 0
+for i in optimal_list:
+    if i > winningPoint:
+        count += 1
+print('Won',count,'times out of 8 number of shuffles')
